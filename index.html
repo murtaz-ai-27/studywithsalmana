@@ -747,6 +747,9 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:34
       <label class="tool-label">Cards:</label>
       <select id="fileCount" class="tool-sel"><option>10</option><option>20</option><option selected>30</option><option>40</option><option>50</option><option>60</option><option>70</option><option>100</option></select>
     </div>
+    <input class="tool-input" type="text" id="fileInstruction"
+      placeholder="Optional: koi instruction? e.g. 'Spanish mein banao' ya 'sirf definitions'"
+      style="margin-bottom:10px"/>
     <button class="tool-btn" id="fileGenBtn" onclick="genFromFile()">🧠 Generate from File / Image</button>
     <div id="fileStatus" class="status-bar" style="display:none"><div class="status-dot" id="fileDot"></div><span id="fileStatusText"></span></div>
     <p style="margin-top:12px;font-size:0.78rem;color:#3e3560;line-height:1.6;padding:10px 14px;background:rgba(167,139,250,0.04);border-radius:10px;border:1px solid rgba(167,139,250,0.12)">💡 Upload lecture notes, textbook chapters, or any study material — AI extracts the most important concepts automatically.</p>
@@ -1260,7 +1263,8 @@ async function genFromFile() {
   const key = getKey();
   if (!key) { showToast('err','🔑 Upar API key save karo pehle!'); return; }
   const count = document.getElementById('fileCount').value;
-  const btn = document.getElementById('fileGenBtn');
+  const instruction = document.getElementById('fileInstruction').value.trim();
+  const extraInstr = instruction ? `\nExtra instruction from user: "${instruction}"` : '';
   const ext = selectedFile.name.split('.').pop().toLowerCase();
   const isImage = ['jpg','jpeg','png'].includes(ext);
 
@@ -1298,7 +1302,7 @@ Return ONLY a JSON array. No markdown, no explanation.
 [{"front":"question or term","back":"answer here"},...]
 - front: max 15 words
 - back: max 50 words
-- Cover the most important information visible in the image
+- Cover the most important information visible in the image${extraInstr}
 Start with [ end with ]`
           }
         ]
@@ -1359,7 +1363,7 @@ Start with [ end with ]`
       const system = `You are an expert study assistant. Create exam-ready flashcards from study material.
 Rules: front max 15 words, back max 50 words. Cover most important concepts.
 Return ONLY a JSON array starting with [. No markdown, no code fences, no explanation.`;
-      const user = `Create exactly ${count} flashcards from this material:\n---\n${text}\n---\nJSON array only:`;
+      const user = `Create exactly ${count} flashcards from this material:${extraInstr}\n---\n${text}\n---\nJSON array only:`;
       nc = await callWithFallback([{role:'system',content:system},{role:'user',content:user}], 'fileDot', 'fileStatusText', 'fileStatus', key);
     }
 

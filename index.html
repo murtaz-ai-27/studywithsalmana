@@ -1262,6 +1262,7 @@ async function genFromFile() {
   if (!selectedFile) { showToast('info','📂 File ya image upload karo pehle!'); return; }
   const key = getKey();
   if (!key) { showToast('err','🔑 Upar API key save karo pehle!'); return; }
+  const btn = document.getElementById('fileGenBtn');
   const count = document.getElementById('fileCount').value;
   const instruction = document.getElementById('fileInstruction').value.trim();
   const extraInstr = instruction ? `\nExtra instruction from user: "${instruction}"` : '';
